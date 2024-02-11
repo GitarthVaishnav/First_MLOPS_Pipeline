@@ -4,51 +4,40 @@ import matplotlib.pyplot as plt
 from tensorflow.keras.datasets import cifar10
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense
-from tensorflow.keras.callbacks import Callback
+from tensorflow.keras.callbacks import Callback, LambdaCallback
 from tensorflow.keras.utils import to_categorical
 from clearml import Task, Dataset, OutputModel
-
-
-class DebugImagesCallback(Callback):
-    def __init__(self, task, validation_images, validation_labels, num_images=10):
-        self.task = task
-        self.validation_images = validation_images
-        self.validation_labels = validation_labels
-        self.num_images = num_images
-
-    def on_epoch_end(self, epoch, logs=None):
-        predictions = np.argmax(
-            self.model.predict(self.validation_images[: self.num_images]), axis=1
-        )
-        for i, prediction in enumerate(predictions):
-            plt.figure(figsize=(2, 2))
-            plt.imshow(self.validation_images[i])
-            plt.title(
-                f"True: {np.argmax(self.validation_labels[i])}, Pred: {prediction}"
-            )
-            plt.axis("off")
-            self.task.logger.report_matplotlib_figure(
-                title=f"Debug Images - Epoch {epoch + 1}",
-                series=f"Image {i + 1}",
-                figure=plt,
-                iteration=epoch,
-            )
-            plt.close()
+import os
 
 
 def train_model(processed_dataset_id, epochs):
-    task = Task.init(project_name="CIFAR-10 Classification", task_name="Model Training")
+    import argparse
+    import numpy as np
+    import matplotlib.pyplot as plt
+    from tensorflow.keras.datasets import cifar10
+    from tensorflow.keras.models import Sequential
+    from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense
+    from tensorflow.keras.callbacks import Callback, LambdaCallback
+    from tensorflow.keras.utils import to_categorical
+    from clearml import Task, Dataset, OutputModel
+
+    task = Task.init(
+        project_name="CIFAR-10 Classification",
+        task_name="Model Training",
+        task_type=Task.TaskTypes.training,
+        auto_connect_frameworks="keras",
+    )
 
     # Access dataset
     dataset = Dataset.get(dataset_id=processed_dataset_id)
     dataset_path = dataset.get_local_copy()
 
-    # Assuming the dataset is stored in .npz format
-    data = np.load(f"{dataset_path}/cifar10.npz")
-    train_images, train_labels = data["train_images"], data["train_labels"]
-    test_images, test_labels = data["test_images"], data["test_labels"]
+    # Load the numpy arrays from the dataset
+    train_images = np.load(f"{dataset_path}/train_images_preprocessed.npy")
+    train_labels = np.load(f"{dataset_path}/train_labels_preprocessed.npy")
+    test_images = np.load(f"{dataset_path}/test_images_preprocessed.npy")
+    test_labels = np.load(f"{dataset_path}/test_labels_preprocessed.npy")
 
-    train_images, test_images = train_images / 255.0, test_images / 255.0
     train_labels, test_labels = to_categorical(train_labels), to_categorical(
         test_labels
     )
@@ -70,30 +59,48 @@ def train_model(processed_dataset_id, epochs):
         optimizer="adam", loss="categorical_crossentropy", metrics=["accuracy"]
     )
 
-    debug_images_callback = DebugImagesCallback(
-        task=task,
-        validation_images=test_images,
-        validation_labels=test_labels,
-        num_images=10,
-    )
+    # Inside your training function, after initializing your task:
+    logger = task.get_logger()
+
+    # Manual logging within model.fit() callback
+    callbacks = [
+        LambdaCallback(
+            on_epoch_end=lambda epoch, logs: [
+                logger.report_scalar(
+                    "loss", "train", iteration=epoch, value=logs["loss"]
+                ),
+                logger.report_scalar(
+                    "accuracy", "train", iteration=epoch, value=logs["accuracy"]
+                ),
+                logger.report_scalar(
+                    "val_loss", "validation", iteration=epoch, value=logs["val_loss"]
+                ),
+                logger.report_scalar(
+                    "val_accuracy",
+                    "validation",
+                    iteration=epoch,
+                    value=logs["val_accuracy"],
+                ),
+            ]
+        )
+    ]
 
     model.fit(
         train_images,
         train_labels,
-        epochs=epochs,
+        epochs=int(epochs),
         validation_data=(test_images, test_labels),
-        callbacks=[debug_images_callback],
+        callbacks=callbacks,
     )
 
-    model.save("model_cifar10.h5")
-
-    # Assuming 'task' is your ClearML task
+    # Save and upload the model to ClearML
+    model_file_name = "model_cifar10.h5"
+    model.save(model_file_name)
     output_model = OutputModel(task=task)
-    output_model.update_weights(
-        "model_cifar10.h5"
-    )  # Upload the model weights to ClearML
+    output_model.update_weights(model_file_name)  # Upload the model weights to ClearML
     output_model.publish()  # Make sure the model is accessible
-    task.upload_artifact("trained_model", artifact_object="model_cifar10.h5")
+    task.upload_artifact("trained_model", artifact_object=model_file_name)
+    os.remove("model_cifar10.h5")
     return output_model.id
 
 

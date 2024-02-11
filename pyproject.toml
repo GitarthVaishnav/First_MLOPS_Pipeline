@@ -12,6 +12,7 @@ tensorflow = "^2.15.0"
 numpy = "^1.26.4"
 matplotlib = "^3.8.2"
 seaborn = "^0.13.2"
+scikit-learn = "^1.4.0"
 
 
 [build-system]
