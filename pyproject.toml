@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "first-mlops-pipeline"
+version = "0.1.0"
+description = "MLOPS Pipeline using ClearML"
+authors = ["Gitarth Vaishnav <Gitarth.Vaishnav@uts.edu.au>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = ">=3.10, <3.12"
+clearml = "^1.14.2"
+tensorflow = "^2.15.0"
+numpy = "^1.26.4"
+matplotlib = "^3.8.2"
+seaborn = "^0.13.2"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
