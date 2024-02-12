@@ -85,6 +85,8 @@ To get a local copy up and running follow these simple steps.
 2. Clone the repo:
     ```sh
    git clone https://github.com/GitarthVaishnav/First_MLOPS_Pipeline.git
+
+   cd First_MLOPS_Pipeline
    ```
 
 3. Install dependencies using Poetry:
