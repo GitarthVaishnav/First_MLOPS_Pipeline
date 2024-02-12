@@ -106,7 +106,7 @@ To get a local copy up and running follow these simple steps.
 <!-- USAGE -->
 ## Usage
 
-Use this pipeline to kickstart your project with CIFAR-10 dataset classification. Adjust models, experiment with different preprocessing techniques, or integrate additional steps into the pipeline as needed.
+Use this pipeline to kickstart your project with basic image classification. You may experiment with different preprocessing techniques, or integrate additional steps into the pipeline as needed.
 
 
 <!-- CONTRIBUTING -->
