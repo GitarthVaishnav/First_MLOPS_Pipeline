@@ -1,6 +1,6 @@
 import argparse
 import numpy as np
-from clearml import Dataset
+from clearml import Dataset, Task
 import os
 
 
@@ -19,9 +19,14 @@ def preprocess_and_upload_cifar10(
 ):
     import argparse
     import numpy as np
-    from clearml import Dataset
+    from clearml import Dataset, Task
     import os
 
+    task = Task.init(
+        project_name=processed_dataset_project,
+        task_name="Dataset Preprocessing",
+        task_type=Task.TaskTypes.data_processing,
+    )
     raw_dataset = Dataset.get(dataset_id=raw_dataset_id)
     raw_data_path = raw_dataset.get_local_copy()
 

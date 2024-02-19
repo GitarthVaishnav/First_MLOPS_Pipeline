@@ -20,9 +20,14 @@ def upload_cifar10_as_numpy(dataset_project, dataset_name):
     import argparse
     import numpy as np
     from tensorflow.keras.datasets import cifar10
-    from clearml import Dataset
+    from clearml import Dataset, Task
     import os
 
+    task = Task.init(
+        project_name=dataset_project,
+        task_name="Dataset Upload",
+        task_type=Task.TaskTypes.data_processing,
+    )
     # Load CIFAR-10 data
     (train_images, train_labels), (test_images, test_labels) = cifar10.load_data()
 

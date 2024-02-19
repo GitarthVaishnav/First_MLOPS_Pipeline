@@ -21,10 +21,20 @@ from first_mlops_pipeline.upload_cifar_raw import (
 from first_mlops_pipeline.evaluate_model import evaluate_model, log_debug_images
 
 
-def create_cifar10_pipeline(epochs: int, pipeline_name: str):
+def create_cifar10_pipeline(
+    epochs: int = 10,
+    pipeline_name: str = "CIFAR-10 Training Pipeline",
+    dataset_project: str = "CIFAR-10 Project",
+    raw_dataset_name: str = "CIFAR-10 Raw",
+    processed_dataset_name: str = "CIFAR-10 Preprocessed",
+    env_path: str = "/path/to/.env",
+    repo_url: str = "git@github.com:YourUser/YourRepo.git",
+    development_branch: str = "development",
+):
     from clearml import PipelineController, Task
     from first_mlops_pipeline.preprocess_upload_cifar10 import (
         preprocess_and_upload_cifar10,
+        save_preprocessed_data,
     )
     from first_mlops_pipeline.train_model import train_model
     from first_mlops_pipeline.update_model import (
@@ -46,20 +56,28 @@ def create_cifar10_pipeline(epochs: int, pipeline_name: str):
     # Initialize a new pipeline controller task
     pipeline = PipelineController(
         name=pipeline_name,
-        project="CIFAR-10 Project",
+        project=dataset_project,
         version="1.0",
     )
 
-    # Add pipeline-level parameters that can be configured
+    # Add pipeline-level parameters with defaults from function arguments
     pipeline.add_parameter(name="epochs", default=epochs)
+    pipeline.add_parameter(name="dataset_project", default=dataset_project)
+    pipeline.add_parameter(name="raw_dataset_name", default=raw_dataset_name)
+    pipeline.add_parameter(
+        name="processed_dataset_name", default=processed_dataset_name
+    )
+    pipeline.add_parameter(name="env_path", default=env_path)
+    pipeline.add_parameter(name="REPO_URL", default=repo_url)
+    pipeline.add_parameter(name="DEVELOPMENT_BRANCH", default=development_branch)
 
     # Step 1: Upload CIFAR-10 Raw Data
     pipeline.add_function_step(
         name="upload_cifar10_raw_data",
         function=upload_cifar10_as_numpy,
         function_kwargs={
-            "dataset_project": "CIFAR-10 Project",
-            "dataset_name": "CIFAR-10 Raw",
+            "dataset_project": "${pipeline.dataset_project}",
+            "dataset_name": "${pipeline.raw_dataset_name}",
         },
         function_return=["raw_dataset_id"],
         helper_functions=[save_numpy_arrays],
@@ -72,8 +90,8 @@ def create_cifar10_pipeline(epochs: int, pipeline_name: str):
         function=preprocess_and_upload_cifar10,
         function_kwargs={
             "raw_dataset_id": "${upload_cifar10_raw_data.raw_dataset_id}",
-            "processed_dataset_project": "CIFAR-10 Project",
-            "processed_dataset_name": "CIFAR-10 Preprocessed",
+            "processed_dataset_project": "${pipeline.dataset_project}",
+            "processed_dataset_name": "${pipeline.processed_dataset_name}",
         },
         function_return=["processed_dataset_id"],
         helper_functions=[save_preprocessed_data],
@@ -86,11 +104,9 @@ def create_cifar10_pipeline(epochs: int, pipeline_name: str):
         function=train_model,
         function_kwargs={
             "processed_dataset_id": "${preprocess_cifar10_data.processed_dataset_id}",
-            # Use the pipeline parameter directly in the function step
             "epochs": "${pipeline.epochs}",
         },
         function_return=["model_id"],
-        helper_functions=[],
         cache_executed_step=False,
     )
 
@@ -111,19 +127,23 @@ def create_cifar10_pipeline(epochs: int, pipeline_name: str):
         name="update_model_in_github",
         function=update_model,
         function_kwargs={
-            "model_id": "${train_cifar10_model.model_id}",  # Use model_id from the train_model step
+            "model_id": "${train_cifar10_model.model_id}",
+            "env_path": "${pipeline.env_path}",
+            "REPO_URL": "${pipeline.REPO_URL}",
+            "DEVELOPMENT_BRANCH": "${pipeline.DEVELOPMENT_BRANCH}",
         },
         helper_functions=[
             configure_ssh_key,
-            update_weights,
+            clone_repo,
             ensure_archive_dir,
+            archive_existing_model,
+            update_weights,
             commit_and_push,
             cleanup_repo,
-            archive_existing_model,
-            clone_repo,
         ],
         cache_executed_step=False,
     )
 
+    # Start the pipeline
     pipeline.start_locally(run_pipeline_steps_locally=True)
     print("CIFAR-10 pipeline initiated. Check ClearML for progress.")

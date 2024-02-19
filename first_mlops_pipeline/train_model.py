@@ -10,7 +10,7 @@ from clearml import Task, Dataset, OutputModel
 import os
 
 
-def train_model(processed_dataset_id, epochs):
+def train_model(processed_dataset_id, epochs, project_name):
     import argparse
     import numpy as np
     import matplotlib.pyplot as plt
@@ -22,7 +22,7 @@ def train_model(processed_dataset_id, epochs):
     from clearml import Task, Dataset, OutputModel
 
     task = Task.init(
-        project_name="CIFAR-10 Classification",
+        project_name=project_name,
         task_name="Model Training",
         task_type=Task.TaskTypes.training,
         auto_connect_frameworks="keras",

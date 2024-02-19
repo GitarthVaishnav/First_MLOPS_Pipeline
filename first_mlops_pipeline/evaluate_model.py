@@ -31,7 +31,7 @@ def log_debug_images(task, images, true_labels, predictions, num_images=10):
         plt.close()
 
 
-def evaluate_model(model_id, processed_dataset_id):
+def evaluate_model(model_id, processed_dataset_id, project_name):
     import argparse
     import numpy as np
     import matplotlib.pyplot as plt
@@ -42,7 +42,9 @@ def evaluate_model(model_id, processed_dataset_id):
     from clearml import Task, Dataset, Model
 
     task = Task.init(
-        project_name="CIFAR-10 Classification", task_name="Model Evaluation"
+        project_name=project_name,
+        task_name="Model Evaluation",
+        task_type=Task.TaskTypes.testing,
     )
 
     # Fetch and load the trained model
