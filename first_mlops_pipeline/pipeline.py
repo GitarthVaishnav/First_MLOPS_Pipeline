@@ -58,6 +58,9 @@ def create_cifar10_pipeline(
         name=pipeline_name,
         project=dataset_project,
         version="1.0",
+        add_pipeline_tags=True,
+        auto_version_bump=True,
+        target_project=dataset_project,
     )
 
     # Add pipeline-level parameters with defaults from function arguments
@@ -79,6 +82,8 @@ def create_cifar10_pipeline(
             "dataset_project": "${pipeline.dataset_project}",
             "dataset_name": "${pipeline.raw_dataset_name}",
         },
+        task_type=Task.TaskTypes.data_processing,
+        task_name="Upload CIFAR-10 Raw Data",
         function_return=["raw_dataset_id"],
         helper_functions=[save_numpy_arrays],
         cache_executed_step=False,
@@ -93,6 +98,8 @@ def create_cifar10_pipeline(
             "processed_dataset_project": "${pipeline.dataset_project}",
             "processed_dataset_name": "${pipeline.processed_dataset_name}",
         },
+        task_type=Task.TaskTypes.data_processing,
+        task_name="Preprocess and Upload CIFAR-10",
         function_return=["processed_dataset_id"],
         helper_functions=[save_preprocessed_data],
         cache_executed_step=False,
@@ -107,6 +114,8 @@ def create_cifar10_pipeline(
             "epochs": "${pipeline.epochs}",
             "project_name": "${pipeline.dataset_project}",
         },
+        task_type=Task.TaskTypes.training,
+        task_name="Train CIFAR-10 Model",
         function_return=["model_id"],
         cache_executed_step=False,
     )
@@ -120,6 +129,8 @@ def create_cifar10_pipeline(
             "processed_dataset_id": "${preprocess_cifar10_data.processed_dataset_id}",
             "project_name": "${pipeline.dataset_project}",
         },
+        task_type=Task.TaskTypes.testing,
+        task_name="Evaluate CIFAR-10 Model",
         helper_functions=[log_debug_images],
         cache_executed_step=False,
     )
@@ -144,6 +155,8 @@ def create_cifar10_pipeline(
             commit_and_push,
             cleanup_repo,
         ],
+        task_type=Task.TaskTypes.custom,
+        task_name="Export Model to GitHub Repository",
         cache_executed_step=False,
     )
 
