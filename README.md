@@ -73,7 +73,7 @@ To get a local copy up and running follow these simple steps.
 
 ### Prerequisites
 
-- Python 3.10+
+- Python 3.9+
 - Poetry for Python package management
 
 ### Installation
@@ -99,8 +99,9 @@ To get a local copy up and running follow these simple steps.
    poetry shell
    ```
 
+5. **IMPORTANT:** Edit the pipeline default parameters and make a repository for deployment weights to be stored in, configure a deploy key for it, save it in a file and put the path of the file in the .env file. Sample project here, please **fork**: [https://github.com/GitarthVaishnav/Cifar10_SimpleFlaskApp](https://github.com/GitarthVaishnav/Cifar10_SimpleFlaskApp) | DON'T push to this project, pipeline will FAIL.
 
-5. Run the pipeline:
+6. Run the pipeline:
     ```sh
    python -m first_mlops_pipeline
    ```
