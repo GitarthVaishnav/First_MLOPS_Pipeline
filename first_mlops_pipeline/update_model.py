@@ -20,7 +20,7 @@ def configure_ssh_key(DEPLOY_KEY_PATH):
     os.environ["GIT_SSH_COMMAND"] = f"ssh -i {DEPLOY_KEY_PATH} -o IdentitiesOnly=yes"
 
 
-def clone_repo(REPO_URL, branch, DEPLOY_KEY_PATH):
+def clone_repo(REPO_URL, branch, DEPLOY_KEY_PATH) -> tuple[Repo, str]:
     import os
     import datetime
     import shutil
@@ -33,14 +33,17 @@ def clone_repo(REPO_URL, branch, DEPLOY_KEY_PATH):
     configure_ssh_key(DEPLOY_KEY_PATH)
     repo_path = REPO_URL.split("/")[-1].split(".git")[0]
     try:
-        repo = Repo.clone_from(REPO_URL, repo_path, branch=branch, single_branch=True)
+        repo: Repo = Repo.clone_from(
+            REPO_URL, repo_path, branch=branch, single_branch=True
+        )
+        print(repo_path)
         return repo, repo_path
     except GitCommandError as e:
         print(f"Failed to clone repository: {e}")
         exit(1)
 
 
-def ensure_archive_dir(repo):
+def ensure_archive_dir(repo: Repo):
     import os
     import datetime
     import shutil
@@ -54,7 +57,7 @@ def ensure_archive_dir(repo):
     os.makedirs(archive_path, exist_ok=True)
 
 
-def archive_existing_model(repo):
+def archive_existing_model(repo: Repo) -> str:
     import os
     import datetime
     import shutil
@@ -64,15 +67,17 @@ def archive_existing_model(repo):
     from dotenv import load_dotenv
 
     """Archives existing model weights."""
+
     weights_path = os.path.join(repo.working_tree_dir, "weights")
     model_file = os.path.join(weights_path, "model.h5")
     if os.path.exists(model_file):
         today = datetime.date.today().strftime("%Y%m%d")
         archived_model_file = os.path.join(weights_path, "archive", f"model-{today}.h5")
         os.rename(model_file, archived_model_file)
+        return archived_model_file  # Return the path of the archived file
 
 
-def update_weights(repo, model_path):
+def update_weights(repo: Repo, model_path):
     import os
     import datetime
     import shutil
@@ -84,13 +89,16 @@ def update_weights(repo, model_path):
     """Updates the model weights in the repository."""
     weights_path = os.path.join(repo.working_tree_dir, "weights")
     ensure_archive_dir(repo)
-    archive_existing_model(repo)
+    archived_model_file = archive_existing_model(repo)
     target_model_path = os.path.join(weights_path, "model.h5")
     shutil.move(model_path, target_model_path)  # Use shutil.move for cross-device move
+    # Add the newly archived model file to the Git index
+    repo.index.add([archived_model_file])
+    # Also add the new model file to the Git index
     repo.index.add([target_model_path])
 
 
-def commit_and_push(repo, model_id, DEVELOPMENT_BRANCH):
+def commit_and_push(repo: Repo, model_id, DEVELOPMENT_BRANCH):
     import os
     import datetime
     import shutil
@@ -185,6 +193,18 @@ if __name__ == "__main__":
         help="Development branch name",
         default="development",
     )
+    parser.add_argument(
+        "--project_name",
+        # required=True,
+        help="ClearML Project name",
+        default="CIFAR-10 Project",
+    )
     args = parser.parse_args()
 
-    update_model(args.model_id, args.env_path, args.repo_url, args.development_branch)
+    update_model(
+        args.model_id,
+        args.env_path,
+        args.repo_url,
+        args.development_branch,
+        args.project_name,
+    )

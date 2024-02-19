@@ -105,6 +105,7 @@ def create_cifar10_pipeline(
         function_kwargs={
             "processed_dataset_id": "${preprocess_cifar10_data.processed_dataset_id}",
             "epochs": "${pipeline.epochs}",
+            "project_name": "${pipeline.dataset_project}",
         },
         function_return=["model_id"],
         cache_executed_step=False,
@@ -117,6 +118,7 @@ def create_cifar10_pipeline(
         function_kwargs={
             "model_id": "${train_cifar10_model.model_id}",
             "processed_dataset_id": "${preprocess_cifar10_data.processed_dataset_id}",
+            "project_name": "${pipeline.dataset_project}",
         },
         helper_functions=[log_debug_images],
         cache_executed_step=False,
@@ -131,6 +133,7 @@ def create_cifar10_pipeline(
             "env_path": "${pipeline.env_path}",
             "REPO_URL": "${pipeline.REPO_URL}",
             "DEVELOPMENT_BRANCH": "${pipeline.DEVELOPMENT_BRANCH}",
+            "project_name": "${pipeline.dataset_project}",
         },
         helper_functions=[
             configure_ssh_key,
