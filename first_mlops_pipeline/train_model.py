@@ -94,13 +94,15 @@ def train_model(processed_dataset_id, epochs):
     )
 
     # Save and upload the model to ClearML
-    model_file_name = "model_cifar10.h5"
+    model_file_name = "model.h5"
     model.save(model_file_name)
     output_model = OutputModel(task=task)
-    output_model.update_weights(model_file_name)  # Upload the model weights to ClearML
+    output_model.update_weights(
+        model_file_name, upload_uri="https://files.clear.ml"
+    )  # Upload the model weights to ClearML
     output_model.publish()  # Make sure the model is accessible
     task.upload_artifact("trained_model", artifact_object=model_file_name)
-    os.remove("model_cifar10.h5")
+    os.remove("model.h5")
     return output_model.id
 
 
