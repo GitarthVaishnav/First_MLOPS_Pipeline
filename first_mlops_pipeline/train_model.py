@@ -102,7 +102,8 @@ def train_model(processed_dataset_id, epochs, project_name):
     )  # Upload the model weights to ClearML
     output_model.publish()  # Make sure the model is accessible
     task.upload_artifact("trained_model", artifact_object=model_file_name)
-    os.remove("model.h5")
+    if os.path.exists("model.h5"):
+        os.remove("model.h5")
     return output_model.id
 
 
