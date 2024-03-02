@@ -3,7 +3,7 @@ import os
 
 import numpy as np
 from clearml import Dataset
-from tensorflow.keras.datasets import cifar10
+from tensorflow.keras.datasets import cifar100
 
 
 def save_numpy_arrays(data, labels, data_filename, labels_filename):
@@ -12,7 +12,7 @@ def save_numpy_arrays(data, labels, data_filename, labels_filename):
 
     import numpy as np
     from clearml import Dataset
-    from tensorflow.keras.datasets import cifar10
+    from tensorflow.keras.datasets import cifar100
 
     np.save(data_filename, data)
     np.save(labels_filename, labels)
@@ -33,7 +33,7 @@ def upload_cifar10_as_numpy(dataset_project, dataset_name):
     )
     task.execute_remotely(queue_name="gitarth", exit_process=True)
     # Load CIFAR-10 data
-    (train_images, train_labels), (test_images, test_labels) = cifar10.load_data()
+    (train_images, train_labels), (test_images, test_labels) = cifar100.load_data()
 
     # Save the numpy arrays to files
     save_numpy_arrays(
