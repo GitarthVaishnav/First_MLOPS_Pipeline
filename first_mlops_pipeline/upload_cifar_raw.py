@@ -1,16 +1,18 @@
 import argparse
-import numpy as np
-from tensorflow.keras.datasets import cifar10
-from clearml import Dataset
 import os
+
+import numpy as np
+from clearml import Dataset
+from tensorflow.keras.datasets import cifar10
 
 
 def save_numpy_arrays(data, labels, data_filename, labels_filename):
     import argparse
-    import numpy as np
-    from tensorflow.keras.datasets import cifar10
-    from clearml import Dataset
     import os
+
+    import numpy as np
+    from clearml import Dataset
+    from tensorflow.keras.datasets import cifar10
 
     np.save(data_filename, data)
     np.save(labels_filename, labels)
@@ -18,16 +20,18 @@ def save_numpy_arrays(data, labels, data_filename, labels_filename):
 
 def upload_cifar10_as_numpy(dataset_project, dataset_name):
     import argparse
-    import numpy as np
-    from tensorflow.keras.datasets import cifar10
-    from clearml import Dataset, Task
     import os
+
+    import numpy as np
+    from clearml import Dataset, Task
+    from tensorflow.keras.datasets import cifar10
 
     task = Task.init(
         project_name=dataset_project,
         task_name="Dataset Upload",
         task_type=Task.TaskTypes.data_processing,
     )
+    task.execute_remotely(queue_name="gitarth", exit_process=True)
     # Load CIFAR-10 data
     (train_images, train_labels), (test_images, test_labels) = cifar10.load_data()
 
