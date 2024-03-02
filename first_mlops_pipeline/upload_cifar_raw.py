@@ -34,7 +34,10 @@ def upload_cifar10_as_numpy(dataset_project, dataset_name):
     task.execute_remotely(queue_name="gitarth", exit_process=True)
     # Load CIFAR-10 data
     (train_images, train_labels), (test_images, test_labels) = cifar100.load_data()
-
+    print(f"Train images shape: {train_images.shape}")
+    print(f"Test images shape: {test_images.shape}")
+    print(f"Train labels shape: {train_labels.shape}")
+    print(f"Test labels shape: {test_labels.shape}")
     # Save the numpy arrays to files
     save_numpy_arrays(
         train_images, train_labels, "train_images_100.npy", "train_labels_100.npy"
