@@ -1,14 +1,16 @@
 import argparse
+import os
+
 import numpy as np
 from clearml import Dataset, Task
-import os
 
 
 def save_preprocessed_data(data, labels, data_filename, labels_filename):
     import argparse
+    import os
+
     import numpy as np
     from clearml import Dataset
-    import os
 
     np.save(data_filename, data)
     np.save(labels_filename, labels)
@@ -18,23 +20,25 @@ def preprocess_and_upload_cifar10(
     raw_dataset_id, processed_dataset_project, processed_dataset_name
 ):
     import argparse
+    import os
+
     import numpy as np
     from clearml import Dataset, Task
-    import os
 
     task = Task.init(
         project_name=processed_dataset_project,
         task_name="Dataset Preprocessing",
         task_type=Task.TaskTypes.data_processing,
     )
+    task.execute_remotely(queue_name="gitarth", exit_process=True)
     raw_dataset = Dataset.get(dataset_id=raw_dataset_id)
     raw_data_path = raw_dataset.get_local_copy()
 
     # Load the numpy arrays from the raw dataset
-    train_images = np.load(f"{raw_data_path}/train_images.npy")
-    train_labels = np.load(f"{raw_data_path}/train_labels.npy")
-    test_images = np.load(f"{raw_data_path}/test_images.npy")
-    test_labels = np.load(f"{raw_data_path}/test_labels.npy")
+    train_images = np.load(f"{raw_data_path}/train_images_100.npy")
+    train_labels = np.load(f"{raw_data_path}/train_images_100.npy")
+    test_images = np.load(f"{raw_data_path}/train_images_100.npy")
+    test_labels = np.load(f"{raw_data_path}/train_images_100.npy")
 
     # Preprocess the images (normalize the pixel values)
     train_images, test_images = train_images / 255.0, test_images / 255.0
@@ -76,7 +80,7 @@ def preprocess_and_upload_cifar10(
     os.remove("test_images_preprocessed.npy")
     os.remove("test_labels_preprocessed.npy")
 
-    print(f"Preprocessed CIFAR-10 dataset uploaded with ID: {processed_dataset.id}")
+    print(f"Preprocessed CIFAR-100 dataset uploaded with ID: {processed_dataset.id}")
     return processed_dataset.id
 
 
