@@ -110,13 +110,7 @@ In order for the agent to pull your code, it needs access to your repositories. 
 ## Step 2: Execute the Tasks Remotely:
 ### Prerequisites:
 1. Fork and Clone a Repository (use this repository to try)
-2. Using Any IDE, make sure that clearml is initialised:
-    
-    In Terminal:
-    ```
-    pip install clearml
-    clearml-init
-    ```
+2. Using Any IDE, make sure that clearml is initialised. Follow: [ClearML Setup](https://github.com/GitarthVaishnav/First_Pipeline/blob/master/docs/Clearml_Setup.md)
 
 ### Implement a Task:
 1. Implement a task (one is already implemented for you - check: [upload_cifar_raw.py](https://github.com/GitarthVaishnav/First_Pipeline/blob/113cf6b2dd15ad5b1896fa78f437830e5f6582c4/first_mlops_pipeline/upload_cifar_raw.py))

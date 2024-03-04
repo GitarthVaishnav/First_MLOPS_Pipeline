@@ -1,5 +1,5 @@
 
-# Getting Started with ClearML
+# Getting Started with ClearML for Development
 
 ClearML is an essential tool for managing Machine Learning experiments, allowing users to track, organize, and optimize your projects with ease. This guide is designed to help you get started by signing up for ClearML's free web instance, installing ClearML in your coding environment, and initializing it with your configuration.
 
@@ -31,23 +31,20 @@ To connect your coding environment with ClearML, you'll need your API credential
     }
     ```
 
-## Step 3: Install ClearML in Your Coding Environment
+## Step 3: Install ClearML in Your Development Environment
 
-### For Google Colab
+### For Google Colab or other Notebook Environments
 
 1. In a new Google Colab notebook, run: `!pip install clearml`.
 
-### For Local Environments and AWS SageMaker
+### For Local Environments/IDEs
 
-Open a terminal on your machine or in your AWS SageMaker instance and follow these steps:
+Open a terminal on your machine and follow these steps:
 
-1. **For Local Environments:**
+1. **For Local Environments/IDEs:**
    - Ensure Python is installed on your machine.
    - Run `pip install clearml` to install ClearML.
 
-2. **For AWS SageMaker:**
-   - In your SageMaker notebook, select the terminal option or open a terminal session.
-   - Execute `pip install clearml` within the terminal to install ClearML.
 
 ## Step 4: Initialize ClearML
 
