@@ -130,7 +130,7 @@ In order for the agent to pull your code, it needs access to your repositories. 
 ### Execute a task:
 1. Run this task for the first time:
     ```
-    python first_mlops_pipeline/upload_cifar_raw.py --dataset_project TrialProject1 --dataset_name 
+    python first_mlops_pipeline/upload_cifar_raw.py --dataset_project TrialProject1 --dataset_name Cifar10RawData
     ```
     This is going to run this experiment in the ClearML Agent.
 
