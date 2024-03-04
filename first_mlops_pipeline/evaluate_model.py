@@ -1,22 +1,24 @@
 import argparse
-import numpy as np
+
 import matplotlib.pyplot as plt
+import numpy as np
 import seaborn as sns
+from clearml import Dataset, Model, Task
+from sklearn.metrics import confusion_matrix
 from tensorflow.keras.models import load_model
 from tensorflow.keras.utils import to_categorical
-from sklearn.metrics import confusion_matrix
-from clearml import Task, Dataset, Model
 
 
 def log_debug_images(task, images, true_labels, predictions, num_images=10):
     import argparse
-    import numpy as np
+
     import matplotlib.pyplot as plt
+    import numpy as np
     import seaborn as sns
+    from clearml import Dataset, Model, Task
+    from sklearn.metrics import confusion_matrix
     from tensorflow.keras.models import load_model
     from tensorflow.keras.utils import to_categorical
-    from sklearn.metrics import confusion_matrix
-    from clearml import Task, Dataset, Model
 
     # Log a set number of test images with their predicted and true labels
     for i in range(num_images):
@@ -33,19 +35,21 @@ def log_debug_images(task, images, true_labels, predictions, num_images=10):
 
 def evaluate_model(model_id, processed_dataset_id, project_name):
     import argparse
-    import numpy as np
+
     import matplotlib.pyplot as plt
+    import numpy as np
     import seaborn as sns
+    from clearml import Dataset, Model, Task
+    from sklearn.metrics import confusion_matrix
     from tensorflow.keras.models import load_model
     from tensorflow.keras.utils import to_categorical
-    from sklearn.metrics import confusion_matrix
-    from clearml import Task, Dataset, Model
 
     task = Task.init(
         project_name=project_name,
         task_name="Model Evaluation",
         task_type=Task.TaskTypes.testing,
     )
+    task.execute_remotely(queue_name="queue_name", exit_process=True)
 
     # Fetch and load the trained model
     model = Model(model_id=model_id)

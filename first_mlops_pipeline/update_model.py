@@ -1,33 +1,36 @@
-import os
-import datetime
-import shutil
 import argparse
-from git import Repo, GitCommandError
+import datetime
+import os
+import shutil
+
 from clearml import Model
 from dotenv import load_dotenv
+from git import GitCommandError, Repo
 
 
 def configure_ssh_key(DEPLOY_KEY_PATH):
-    import os
-    import datetime
-    import shutil
     import argparse
-    from git import Repo, GitCommandError
+    import datetime
+    import os
+    import shutil
+
     from clearml import Model
     from dotenv import load_dotenv
+    from git import GitCommandError, Repo
 
     """Configure Git to use the SSH deploy key for operations."""
     os.environ["GIT_SSH_COMMAND"] = f"ssh -i {DEPLOY_KEY_PATH} -o IdentitiesOnly=yes"
 
 
 def clone_repo(REPO_URL, branch, DEPLOY_KEY_PATH) -> tuple[Repo, str]:
-    import os
-    import datetime
-    import shutil
     import argparse
-    from git import Repo, GitCommandError
+    import datetime
+    import os
+    import shutil
+
     from clearml import Model
     from dotenv import load_dotenv
+    from git import GitCommandError, Repo
 
     """Clone the repository."""
     configure_ssh_key(DEPLOY_KEY_PATH)
@@ -44,13 +47,14 @@ def clone_repo(REPO_URL, branch, DEPLOY_KEY_PATH) -> tuple[Repo, str]:
 
 
 def ensure_archive_dir(repo: Repo):
-    import os
-    import datetime
-    import shutil
     import argparse
-    from git import Repo, GitCommandError
+    import datetime
+    import os
+    import shutil
+
     from clearml import Model
     from dotenv import load_dotenv
+    from git import GitCommandError, Repo
 
     """Ensures the archive directory exists within weights."""
     archive_path = os.path.join(repo.working_tree_dir, "weights", "archive")
@@ -58,13 +62,14 @@ def ensure_archive_dir(repo: Repo):
 
 
 def archive_existing_model(repo: Repo) -> str:
-    import os
-    import datetime
-    import shutil
     import argparse
-    from git import Repo, GitCommandError
+    import datetime
+    import os
+    import shutil
+
     from clearml import Model
     from dotenv import load_dotenv
+    from git import GitCommandError, Repo
 
     """Archives existing model weights."""
 
@@ -78,13 +83,14 @@ def archive_existing_model(repo: Repo) -> str:
 
 
 def update_weights(repo: Repo, model_path):
-    import os
-    import datetime
-    import shutil
     import argparse
-    from git import Repo, GitCommandError
+    import datetime
+    import os
+    import shutil
+
     from clearml import Model
     from dotenv import load_dotenv
+    from git import GitCommandError, Repo
 
     """Updates the model weights in the repository."""
     weights_path = os.path.join(repo.working_tree_dir, "weights")
@@ -99,13 +105,14 @@ def update_weights(repo: Repo, model_path):
 
 
 def commit_and_push(repo: Repo, model_id, DEVELOPMENT_BRANCH):
-    import os
-    import datetime
-    import shutil
     import argparse
-    from git import Repo, GitCommandError
+    import datetime
+    import os
+    import shutil
+
     from clearml import Model
     from dotenv import load_dotenv
+    from git import GitCommandError, Repo
 
     """Commits and pushes changes to the remote repository."""
     commit_message = f"Update model weights: {model_id}"
@@ -121,32 +128,35 @@ def commit_and_push(repo: Repo, model_id, DEVELOPMENT_BRANCH):
 
 
 def cleanup_repo(repo_path):
-    import os
-    import datetime
-    import shutil
     import argparse
-    from git import Repo, GitCommandError
+    import datetime
+    import os
+    import shutil
+
     from clearml import Model, Task
     from dotenv import load_dotenv
+    from git import GitCommandError, Repo
 
     """Safely remove the cloned repository directory."""
     shutil.rmtree(repo_path, ignore_errors=True)
 
 
 def update_model(model_id, env_path, REPO_URL, DEVELOPMENT_BRANCH, project_name):
-    import os
-    import datetime
-    import shutil
     import argparse
-    from git import Repo, GitCommandError
+    import datetime
+    import os
+    import shutil
+
     from clearml import Model, Task
     from dotenv import load_dotenv
+    from git import GitCommandError, Repo
 
     task = Task.init(
         project_name=project_name,
         task_name="Model Upload",
         task_type=Task.TaskTypes.custom,
     )
+    task.execute_remotely(queue_name="queue_name", exit_process=True)
     """Fetches the trained model using its ID and updates it in the repository."""
     load_dotenv(dotenv_path=env_path)
     DEPLOY_KEY_PATH = os.getenv("DEPLOY_KEY_PATH")

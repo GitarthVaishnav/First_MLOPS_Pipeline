@@ -30,15 +30,15 @@ def preprocess_and_upload_cifar10(
         task_name="Dataset Preprocessing",
         task_type=Task.TaskTypes.data_processing,
     )
-    task.execute_remotely(queue_name="gitarth", exit_process=True)
+    task.execute_remotely(queue_name="queue_name", exit_process=True)
     raw_dataset = Dataset.get(dataset_id=raw_dataset_id)
     raw_data_path = raw_dataset.get_local_copy()
 
     # Load the numpy arrays from the raw dataset
-    train_images = np.load(f"{raw_data_path}/train_images_100.npy")
-    train_labels = np.load(f"{raw_data_path}/train_images_100.npy")
-    test_images = np.load(f"{raw_data_path}/train_images_100.npy")
-    test_labels = np.load(f"{raw_data_path}/train_images_100.npy")
+    train_images = np.load(f"{raw_data_path}/train_images_10.npy")
+    train_labels = np.load(f"{raw_data_path}/train_images_10.npy")
+    test_images = np.load(f"{raw_data_path}/train_images_10.npy")
+    test_labels = np.load(f"{raw_data_path}/train_images_10.npy")
 
     # Preprocess the images (normalize the pixel values)
     train_images, test_images = train_images / 255.0, test_images / 255.0

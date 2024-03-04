@@ -1,4 +1,6 @@
 from clearml import PipelineController, Task
+
+from first_mlops_pipeline.evaluate_model import evaluate_model, log_debug_images
 from first_mlops_pipeline.preprocess_upload_cifar10 import (
     preprocess_and_upload_cifar10,
     save_preprocessed_data,
@@ -15,10 +17,9 @@ from first_mlops_pipeline.update_model import (
     update_weights,
 )
 from first_mlops_pipeline.upload_cifar_raw import (
-    upload_cifar10_as_numpy,
     save_numpy_arrays,
+    upload_cifar10_as_numpy,
 )
-from first_mlops_pipeline.evaluate_model import evaluate_model, log_debug_images
 
 
 def create_cifar10_pipeline(
@@ -32,6 +33,8 @@ def create_cifar10_pipeline(
     development_branch: str = "development",
 ):
     from clearml import PipelineController, Task
+
+    from first_mlops_pipeline.evaluate_model import evaluate_model, log_debug_images
     from first_mlops_pipeline.preprocess_upload_cifar10 import (
         preprocess_and_upload_cifar10,
         save_preprocessed_data,
@@ -39,19 +42,18 @@ def create_cifar10_pipeline(
     from first_mlops_pipeline.train_model import train_model
     from first_mlops_pipeline.update_model import (
         archive_existing_model,
+        cleanup_repo,
         clone_repo,
         commit_and_push,
         configure_ssh_key,
         ensure_archive_dir,
-        cleanup_repo,
         update_model,
         update_weights,
     )
     from first_mlops_pipeline.upload_cifar_raw import (
-        upload_cifar10_as_numpy,
         save_numpy_arrays,
+        upload_cifar10_as_numpy,
     )
-    from first_mlops_pipeline.evaluate_model import evaluate_model, log_debug_images
 
     # Initialize a new pipeline controller task
     pipeline = PipelineController(
@@ -161,5 +163,5 @@ def create_cifar10_pipeline(
     )
 
     # Start the pipeline
-    pipeline.start_locally(run_pipeline_steps_locally=True)
+    pipeline.start(queue="gitarth")
     print("CIFAR-10 pipeline initiated. Check ClearML for progress.")

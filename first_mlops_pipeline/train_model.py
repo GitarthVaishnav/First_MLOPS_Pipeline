@@ -1,25 +1,27 @@
 import argparse
-import numpy as np
-import matplotlib.pyplot as plt
-from tensorflow.keras.datasets import cifar10
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense
-from tensorflow.keras.callbacks import Callback, LambdaCallback
-from tensorflow.keras.utils import to_categorical
-from clearml import Task, Dataset, OutputModel
 import os
+
+import matplotlib.pyplot as plt
+import numpy as np
+from clearml import Dataset, OutputModel, Task
+from tensorflow.keras.callbacks import Callback, LambdaCallback
+from tensorflow.keras.datasets import cifar10
+from tensorflow.keras.layers import Conv2D, Dense, Flatten, MaxPooling2D
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.utils import to_categorical
 
 
 def train_model(processed_dataset_id, epochs, project_name):
     import argparse
-    import numpy as np
+
     import matplotlib.pyplot as plt
-    from tensorflow.keras.datasets import cifar10
-    from tensorflow.keras.models import Sequential
-    from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense
+    import numpy as np
+    from clearml import Dataset, OutputModel, Task
     from tensorflow.keras.callbacks import Callback, LambdaCallback
+    from tensorflow.keras.datasets import cifar10
+    from tensorflow.keras.layers import Conv2D, Dense, Flatten, MaxPooling2D
+    from tensorflow.keras.models import Sequential
     from tensorflow.keras.utils import to_categorical
-    from clearml import Task, Dataset, OutputModel
 
     task = Task.init(
         project_name=project_name,
@@ -27,6 +29,7 @@ def train_model(processed_dataset_id, epochs, project_name):
         task_type=Task.TaskTypes.training,
         auto_connect_frameworks="keras",
     )
+    task.execute_remotely(queue_name="queue_name", exit_process=True)
 
     # Access dataset
     dataset = Dataset.get(dataset_id=processed_dataset_id)
