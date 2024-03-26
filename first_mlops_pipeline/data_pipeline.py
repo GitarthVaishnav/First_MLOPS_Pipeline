@@ -44,6 +44,9 @@ def create_cifar10_data_pipeline(
     pipeline.add_parameter(
         name="processed_dataset_name", default=processed_dataset_name
     )
+    pipeline.add_parameter(
+        name="queue_name", default=queue_name
+    )
 
     # Step 1: Upload CIFAR-10 Raw Data
     pipeline.add_function_step(
@@ -52,6 +55,7 @@ def create_cifar10_data_pipeline(
         function_kwargs={
             "dataset_project": "${pipeline.dataset_project}",
             "dataset_name": "${pipeline.raw_dataset_name}",
+            "queue_name": "${pipeline.queue_name}",
         },
         task_type=Task.TaskTypes.data_processing,
         task_name="Upload CIFAR-10 Raw Data",
@@ -68,6 +72,7 @@ def create_cifar10_data_pipeline(
             "raw_dataset_id": "${upload_cifar10_raw_data.raw_dataset_id}",
             "processed_dataset_project": "${pipeline.dataset_project}",
             "processed_dataset_name": "${pipeline.processed_dataset_name}",
+            "queue_name": "${pipeline.queue_name}",
         },
         task_type=Task.TaskTypes.data_processing,
         task_name="Preprocess and Upload CIFAR-10",
