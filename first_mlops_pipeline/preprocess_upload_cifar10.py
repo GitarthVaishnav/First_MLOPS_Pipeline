@@ -17,7 +17,7 @@ def save_preprocessed_data(data, labels, data_filename, labels_filename):
 
 
 def preprocess_and_upload_cifar10(
-    raw_dataset_id, processed_dataset_project, processed_dataset_name
+    raw_dataset_id, processed_dataset_project, processed_dataset_name, queue_name
 ):
     import argparse
     import os
@@ -30,7 +30,7 @@ def preprocess_and_upload_cifar10(
         task_name="Dataset Preprocessing",
         task_type=Task.TaskTypes.data_processing,
     )
-    task.execute_remotely(queue_name="queue_name", exit_process=True)
+    task.execute_remotely(queue_name=queue_name, exit_process=True)
     raw_dataset = Dataset.get(dataset_id=raw_dataset_id)
     raw_data_path = raw_dataset.get_local_copy()
 
@@ -106,7 +106,13 @@ if __name__ == "__main__":
         required=True,
         help="Name for the processed dataset in ClearML",
     )
+    parser.add_argument(
+        "--queue_name",
+        type=str,
+        required=True,
+        help="ClearML queue name",
+    )
     args = parser.parse_args()
     preprocess_and_upload_cifar10(
-        args.raw_dataset_id, args.processed_dataset_project, args.processed_dataset_name
+        args.raw_dataset_id, args.processed_dataset_project, args.processed_dataset_name, args.queue_name
     )

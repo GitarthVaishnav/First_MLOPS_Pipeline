@@ -1,5 +1,6 @@
 import argparse
 import os
+import queue
 
 import numpy as np
 from clearml import Dataset
@@ -18,7 +19,7 @@ def save_numpy_arrays(data, labels, data_filename, labels_filename):
     np.save(labels_filename, labels)
 
 
-def upload_cifar10_as_numpy(dataset_project, dataset_name):
+def upload_cifar10_as_numpy(dataset_project, dataset_name, queue_name):
     import argparse
     import os
 
@@ -31,7 +32,7 @@ def upload_cifar10_as_numpy(dataset_project, dataset_name):
         task_name="Dataset Upload",
         task_type=Task.TaskTypes.data_processing,
     )
-    task.execute_remotely(queue_name="queue_name", exit_process=True)
+    task.execute_remotely(queue_name=queue_name, exit_process=True)
     # Load CIFAR-10 data
     (train_images, train_labels), (test_images, test_labels) = cifar10.load_data()
     print(f"Train images shape: {train_images.shape}")
@@ -85,5 +86,11 @@ if __name__ == "__main__":
         required=True,
         help="ClearML dataset name for raw data",
     )
+    parser.add_argument(
+        "--queue_name",
+        type=str,
+        required=True,
+        help="ClearML queue name",
+    )
     args = parser.parse_args()
-    upload_cifar10_as_numpy(args.dataset_project, args.dataset_name)
+    upload_cifar10_as_numpy(args.dataset_project, args.dataset_name, queue_name=args.queue_name)
